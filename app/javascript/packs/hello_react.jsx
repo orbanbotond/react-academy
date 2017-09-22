@@ -32,13 +32,13 @@ class Hello2 extends React.Component {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  ReactDOM.render(
-    <Hello name="React" />,
-    document.body.appendChild(document.createElement('div')),
-  )
-  ReactDOM.render(
-    <Hello2 name="React" />,
-    document.body.appendChild(document.createElement('div')),
-  )
-})
+// document.addEventListener('DOMContentLoaded', () => {
+//   ReactDOM.render(
+//     <Hello name="React" />,
+//     document.body.appendChild(document.createElement('div')),
+//   )
+//   ReactDOM.render(
+//     <Hello2 name="React" />,
+//     document.body.appendChild(document.createElement('div')),
+//   )
+// })
