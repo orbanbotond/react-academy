@@ -4,6 +4,7 @@ describe User do
   context 'fields' do
     it { should respond_to(:name) }
     it { should respond_to(:password_hash) }
+    it { should respond_to(:admin?) }
   end
 
   context '#' do
