@@ -27,6 +27,15 @@ class Login extends React.Component {
 
   handleSubmit(event) {
     event.preventDefault();
+
+    $.ajax({
+      url: Routes.login_users_path(),
+      data: { name: this.state.name, password: this.state.pwd }
+    }).done(function( msg ) {
+      alert( "Yeiyy" );
+    }).fail(function(msd){
+      alert( "Sorry, unauthorized!" );
+    });
   }
 
   render() {
