@@ -18,9 +18,27 @@ Hello.propTypes = {
   name: PropTypes.string
 }
 
+class Hello2 extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return (
+      <div>
+        Hello world 2
+      </div>
+    );
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   ReactDOM.render(
     <Hello name="React" />,
+    document.body.appendChild(document.createElement('div')),
+  )
+  ReactDOM.render(
+    <Hello2 name="React" />,
     document.body.appendChild(document.createElement('div')),
   )
 })
