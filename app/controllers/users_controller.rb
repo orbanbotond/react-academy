@@ -3,8 +3,8 @@ class UsersController < ApplicationController
 
   # GET /users.json
   def login
-    user = User.find_by name: params[:name]
-    if user.password == params[:password]
+    @user = User.find_by name: params[:name]
+    if @user.password == params[:password]
       render status: 200
     else
       render status: 401

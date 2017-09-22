@@ -32,7 +32,11 @@ class Login extends React.Component {
       url: Routes.login_users_path(),
       data: { name: this.state.name, password: this.state.pwd }
     }).done(function( msg ) {
-      alert( "Yeiyy" );
+      if(msg.admin){
+        alert( "Yeiyy, welcome admin" );
+      }else{
+        alert( "Yeiyy, welcome user" );
+      }
     }).fail(function(msd){
       alert( "Sorry, unauthorized!" );
     });
