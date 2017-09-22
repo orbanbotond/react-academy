@@ -1,7 +1,5 @@
-// Run this example by adding <%= javascript_pack_tag 'hello_react' %> to the head of your layout file,
-// like app/views/layouts/application.html.erb. All it does is render <div>Hello React</div> at the bottom
-// of the page.
-
+import AdminView from './admin_react'
+import UserView from './user_react'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
@@ -31,11 +29,11 @@ class Login extends React.Component {
     $.ajax({
       url: Routes.login_users_path(),
       data: { name: this.state.name, password: this.state.pwd }
-    }).done(function( msg ) {
+    }).done(( msg ) => {
       if(msg.admin){
-        alert( "Yeiyy, welcome admin" );
+        this.switchToAdminView(msg);
       }else{
-        alert( "Yeiyy, welcome user" );
+        this.switchToUserView(msg);
       }
     }).fail(function(msd){
       alert( "Sorry, unauthorized!" );
@@ -57,6 +55,21 @@ class Login extends React.Component {
       </form>
     );
   }
+
+  switchToAdminView(user){
+    ReactDOM.render(
+      <AdminView user={user}/>,
+      document.body.appendChild(document.createElement('div')),
+    )
+  }
+
+  switchToUserView(user){
+    ReactDOM.render(
+      <UserView user={user}/>,
+      document.body.appendChild(document.createElement('div')),
+    )
+  }
+
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -65,4 +78,3 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.appendChild(document.createElement('div')),
   )
 })
-
