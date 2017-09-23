@@ -58,6 +58,9 @@ class RepairForm extends React.Component{
     const target = event.target;
     const value = target.checked;
     this.setState({complete: value});
+    if(!value){
+      this.setState({approved: false});
+    }
   }
 
   handleApprovedChange(event){
@@ -78,7 +81,7 @@ class RepairForm extends React.Component{
             <input type="checkbox" checked={this.state.complete} onChange={this.handleCompletedChange} />
           </td>
           <td>
-            <input type="checkbox" checked={this.state.approved} onChange={this.handleApprovedChange} />
+            <input type="checkbox" checked={this.state.approved} onChange={this.handleApprovedChange} disabled={!this.state.complete}/>
           </td>
           <td>
           </td>
