@@ -1,0 +1,29 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Complete:</strong>
+  <%= @repair.complete %>
+</p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @repair.name %>
+</p>
+
+<p>
+  <strong>User:</strong>
+  <%= @repair.user %>
+</p>
+
+<p>
+  <strong>Approved:</strong>
+  <%= @repair.approved %>
+</p>
+
+<p>
+  <strong>Starts at:</strong>
+  <%= @repair.starts_at %>
+</p>
+
+<%= link_to 'Edit', edit_repair_path(@repair) %> |
+<%= link_to 'Back', repairs_path %>
