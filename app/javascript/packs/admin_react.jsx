@@ -34,7 +34,7 @@ class RepairForm extends React.Component{
   }
 
   handleCancel(){
-    this.props.switchToViewMode();
+    this.props.switchToViewMode(this.props.entity);
   }
 
   handleSubmit(event){
@@ -45,14 +45,15 @@ class RepairForm extends React.Component{
       url: Routes.repair_path(this.state.id,'json'),
       data: {repair: { name: this.state.name, complete: this.state.complete, approved: this.state.approved, user_id: this.state.user_id }}
     }).done(( msg ) => {
-      this.props.switchToViewMode();
+      this.props.switchToViewMode(this.state);
     }).fail(function(msd){
       alert( "Sorry, unauthorized!" );
     });
   }
 
   handleUserChange(event){
-    // this.setState({name: event.target.value});
+    var value = event.target.value === 'null' ? null : parseInt(event.target.value);
+    this.setState({user_id: value});
   }
 
   handleNameChange(event){
@@ -73,27 +74,36 @@ class RepairForm extends React.Component{
   }
 
   render(){
-    const { complete, approved, name } = this.state;
+    const { complete, approved, name, user_id } = this.state;
+
+    var options_for_user = this.props.users.map((user) =>
+      <option key={user.id} value={user.id}>{user.name}</option>
+    );
+
+    var please_select_user_or_unassign = (this.state.user_id) ? <option key='null' value='null'>Unassign The User</option>: <option key='null' value='null'>Pleaser Select a User</option>;
 
     return (
-        <tr>
-          <td>
-            <input type="text" placeholder="Name" value={name} onChange={this.handleNameChange} />
-          </td>
-          <td>
-            <input type="checkbox" checked={complete} onChange={this.handleCompletedChange} />
-          </td>
-          <td>
-            <input type="checkbox" checked={approved} onChange={this.handleApprovedChange} disabled={!complete}/>
-          </td>
-          <td>
-          </td>
-          <td>
-            <input type="submit" value="Submit" onClick={this.handleSubmit} />
-            <input type="submit" value="Cancel" onClick={this.handleCancel} />
-          </td>
-        </tr>
-
+      <tr>
+        <td>
+          <input type="text" placeholder="Name" value={name} onChange={this.handleNameChange} />
+        </td>
+        <td>
+          <input type="checkbox" checked={complete} onChange={this.handleCompletedChange} />
+        </td>
+        <td>
+          <input type="checkbox" checked={approved} onChange={this.handleApprovedChange} disabled={!complete}/>
+        </td>
+        <td>
+          <select value={user_id} onChange={this.handleUserChange}>
+            {please_select_user_or_unassign}
+            {options_for_user}
+          </select>
+        </td>
+        <td>
+          <input type="submit" value="Submit" onClick={this.handleSubmit} />
+          <input type="submit" value="Cancel" onClick={this.handleCancel} />
+        </td>
+      </tr>
     )
   }
 }
@@ -102,7 +112,7 @@ class Repair extends React.Component{
   constructor(props) {
     super(props);
 
-    this.state = { editMode: false };
+    this.state = { editMode: false, repair: this.props.entity };
 
     this.switchToEditMode = this.switchToEditMode.bind(this);
     this.switchToViewMode = this.switchToViewMode.bind(this);
@@ -119,25 +129,37 @@ class Repair extends React.Component{
   }
 
   renderForm() {
-    return <RepairForm entity={this.props.entity} switchToViewMode={this.switchToViewMode}/>;
+    return <RepairForm users={this.props.users} entity={this.props.entity} switchToViewMode={this.switchToViewMode}/>;
   }
 
   switchToEditMode() {
     this.setState({editMode: true});
   }
 
-  switchToViewMode() {
-    this.setState({editMode: false});
+  switchToViewMode(repair) {
+    this.setState({editMode: false, repair: repair});
+  }
+
+  retrieve_user_name(user_id){
+    if(user_id){
+      return this.props.users.filter((user) =>{
+        return user.id === user_id;
+      })[0].name;
+    }else{
+      return 'Unassigned';
+    }
   }
 
   renderRepair() {
+    const { complete, approved, name, user_id, starts_at } = this.state.repair;
+    const user_name = this.retrieve_user_name(user_id);
     return (
       <tr>
-        <td>{this.props.entity.name}</td>
-        <td>{this.props.entity.complete.toString()}</td>
-        <td>{this.props.entity.approved.toString()}</td>
-        <td>{this.props.entity.user_id}</td>
-        <td>{this.props.entity.starts_at}</td>
+        <td>{name}</td>
+        <td>{complete.toString()}</td>
+        <td>{approved.toString()}</td>
+        <td>{user_name}</td>
+        <td>{starts_at}</td>
         <td><button onClick={this.switchToEditMode} >Edit</button></td>
       </tr>
     );
@@ -152,15 +174,18 @@ class Repairs extends React.Component{
   }
 
   componentWillMount() {
-    $.ajax({
-      url: Routes.repairs_path('json')}).done((msg)=>{
+    $.ajax({ url: Routes.repairs_path('json')}).done((msg)=>{
         this.setState({repairs: msg})
+      });
+
+    $.ajax({ url: Routes.users_path('json')}).done((msg)=>{
+        this.setState({users: msg})
       });
   }
 
   render() {
     var content = this.state.repairs.map((entity) =>
-      <Repair key={entity.id} entity={entity} />
+      <Repair key={entity.id} entity={entity} users={this.state.users}/>
     );
 
     return (
