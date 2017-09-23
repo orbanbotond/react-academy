@@ -31,9 +31,25 @@ class RepairForm extends React.Component{
     this.handleUserChange = this.handleUserChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleCancel = this.handleCancel.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
+  }
+
+  handleDelete(){
+    event.preventDefault();
+
+    $.ajax({
+      method: 'DELETE',
+      url: Routes.repair_path(this.state.id,'json')
+    }).done(( msg ) => {
+      this.props.onDelete(this.state.id);
+    }).fail(function(msd){
+      alert( "Sorry, unauthorized!" );
+    });
   }
 
   handleCancel(){
+    event.preventDefault();
+
     this.props.switchToViewMode(this.props.entity);
   }
 
@@ -102,6 +118,7 @@ class RepairForm extends React.Component{
         <td>
           <input type="submit" value="Submit" onClick={this.handleSubmit} />
           <input type="submit" value="Cancel" onClick={this.handleCancel} />
+          <input type="submit" value="Delete" onClick={this.handleDelete} />
         </td>
       </tr>
     )
@@ -116,6 +133,11 @@ class Repair extends React.Component{
 
     this.switchToEditMode = this.switchToEditMode.bind(this);
     this.switchToViewMode = this.switchToViewMode.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
+  }
+
+  handleDelete(){
+    this.props.onDelete(this.state.repair.id);
   }
 
   render() {
@@ -129,7 +151,7 @@ class Repair extends React.Component{
   }
 
   renderForm() {
-    return <RepairForm users={this.props.users} entity={this.props.entity} switchToViewMode={this.switchToViewMode}/>;
+    return <RepairForm users={this.props.users} entity={this.props.entity} switchToViewMode={this.switchToViewMode} onDelete={this.handleDelete} />;
   }
 
   switchToEditMode() {
@@ -171,6 +193,13 @@ class Repairs extends React.Component{
     super(props);
 
     this.state = {repairs: []};
+    this.handleDelete = this.handleDelete.bind(this);
+  }
+
+  handleDelete(removed_id){
+    var new_repairs = this.state.repairs.filter((repair) => { return repair.id != removed_id });
+
+    this.setState({repairs: new_repairs})
   }
 
   componentWillMount() {
@@ -185,7 +214,7 @@ class Repairs extends React.Component{
 
   render() {
     var content = this.state.repairs.map((entity) =>
-      <Repair key={entity.id} entity={entity} users={this.state.users}/>
+      <Repair key={entity.id} entity={entity} users={this.state.users} onDelete={this.handleDelete} />
     );
 
     return (
