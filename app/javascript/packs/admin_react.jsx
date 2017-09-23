@@ -30,6 +30,11 @@ class RepairForm extends React.Component{
     this.handleApprovedChange = this.handleApprovedChange.bind(this);
     this.handleUserChange = this.handleUserChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleCancel = this.handleCancel.bind(this);
+  }
+
+  handleCancel(){
+    this.props.switchToViewMode();
   }
 
   handleSubmit(event){
@@ -40,7 +45,7 @@ class RepairForm extends React.Component{
       url: Routes.repair_path(this.state.id,'json'),
       data: {repair: { name: this.state.name, complete: this.state.complete, approved: this.state.approved, user_id: this.state.user_id }}
     }).done(( msg ) => {
-      alert( "Yeiyy" );
+      this.props.switchToViewMode();
     }).fail(function(msd){
       alert( "Sorry, unauthorized!" );
     });
@@ -68,25 +73,24 @@ class RepairForm extends React.Component{
   }
 
   render(){
-
-    const { name, calories, meal_date, meal_time } = this.state;
+    const { complete, approved, name } = this.state;
 
     return (
-
         <tr>
           <td>
-            <input type="text" placeholder="Name" value={this.state.name} onChange={this.handleNameChange} />
+            <input type="text" placeholder="Name" value={name} onChange={this.handleNameChange} />
           </td>
           <td>
-            <input type="checkbox" checked={this.state.complete} onChange={this.handleCompletedChange} />
+            <input type="checkbox" checked={complete} onChange={this.handleCompletedChange} />
           </td>
           <td>
-            <input type="checkbox" checked={this.state.approved} onChange={this.handleApprovedChange} disabled={!this.state.complete}/>
+            <input type="checkbox" checked={approved} onChange={this.handleApprovedChange} disabled={!complete}/>
           </td>
           <td>
           </td>
           <td>
             <input type="submit" value="Submit" onClick={this.handleSubmit} />
+            <input type="submit" value="Cancel" onClick={this.handleCancel} />
           </td>
         </tr>
 
@@ -101,6 +105,7 @@ class Repair extends React.Component{
     this.state = { editMode: false };
 
     this.switchToEditMode = this.switchToEditMode.bind(this);
+    this.switchToViewMode = this.switchToViewMode.bind(this);
   }
 
   render() {
@@ -114,11 +119,15 @@ class Repair extends React.Component{
   }
 
   renderForm() {
-    return <RepairForm entity={this.props.entity} />;
+    return <RepairForm entity={this.props.entity} switchToViewMode={this.switchToViewMode}/>;
   }
 
   switchToEditMode() {
     this.setState({editMode: true});
+  }
+
+  switchToViewMode() {
+    this.setState({editMode: false});
   }
 
   renderRepair() {
