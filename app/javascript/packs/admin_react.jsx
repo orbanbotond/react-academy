@@ -29,15 +29,37 @@ class Repairs extends React.Component{
   componentWillMount() {
     $.ajax({
       url: Routes.repairs_path('json')}).done((msg)=>{
-        debugger
         this.setState({repairs: msg})
       });
   }
 
   render() {
+    var content = this.state.repairs.map((entity) =>
+      <tr key={entity.id}>
+        <td>{entity.name}</td>
+        <td>{entity.complete}</td>
+        <td>{entity.approved}</td>
+        <td>{entity.user_id}</td>
+        <td>{entity.starts_at}</td>
+      </tr>
+    );
+
     return (
-      <div >
-          Repairs
+      <div>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Completed</th>
+              <th>Approved</th>
+              <th>User</th>
+              <th>Started At</th>
+            </tr>
+          </thead>
+          <tbody>
+            {content}
+          </tbody>
+        </table>
       </div>
     );
   }  
