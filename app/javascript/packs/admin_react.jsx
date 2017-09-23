@@ -49,19 +49,23 @@ class RepairForm extends React.Component{
 
   handleCancel(){
     event.preventDefault();
+    const entity = (this.state.id) ? this.props.entity : this.state;
 
-    this.props.switchToViewMode(this.props.entity);
+    this.props.switchToViewMode(entity);
   }
 
   handleSubmit(event){
     event.preventDefault();
 
+    const url = (this.state.id) ? Routes.repair_path(this.state.id,'json') : Routes.repairs_path('json');
+    const method = (this.state.id) ? 'PATCH' : 'POST';
+
     $.ajax({
-      method: 'PATCH',
-      url: Routes.repair_path(this.state.id,'json'),
+      method: method,
+      url: url,
       data: {repair: { name: this.state.name, complete: this.state.complete, approved: this.state.approved, user_id: this.state.user_id }}
     }).done(( msg ) => {
-      this.props.switchToViewMode(this.state);
+      this.props.switchToViewMode(msg);
     }).fail(function(msd){
       alert( "Sorry, unauthorized!" );
     });
@@ -98,6 +102,8 @@ class RepairForm extends React.Component{
 
     var please_select_user_or_unassign = (this.state.user_id) ? <option key='null' value='null'>Unassign The User</option>: <option key='null' value='null'>Pleaser Select a User</option>;
 
+    var delete_button = this.props.onDelete ? <input type="submit" value="Delete" onClick={this.handleDelete} /> : '';
+
     return (
       <tr>
         <td>
@@ -118,7 +124,7 @@ class RepairForm extends React.Component{
         <td>
           <input type="submit" value="Submit" onClick={this.handleSubmit} />
           <input type="submit" value="Cancel" onClick={this.handleCancel} />
-          <input type="submit" value="Delete" onClick={this.handleDelete} />
+          {delete_button}
         </td>
       </tr>
     )
@@ -188,12 +194,65 @@ class Repair extends React.Component{
   }
 }
 
+class AddNewRepair extends React.Component{
+  constructor(props) {
+    super(props);
+
+    this.state = {showButton: true, entity: {name:'', complete:false, approved: false, user_id: ''}};
+    this.handleAddNew = this.handleAddNew.bind(this);
+    this.switchBackToButton = this.switchBackToButton.bind(this);
+  }
+
+  handleAddNew(event){
+    event.preventDefault();
+
+    this.setState({showButton: false});
+  }
+
+  switchBackToButton(data){
+    if (data.id){
+      this.props.onSuccess(data);
+    }
+    this.setState({showButton: true, entity: data});
+  }
+
+  renderShowButton(){
+    return <button onClick={this.handleAddNew}>Add New Repair</button>;
+  }
+
+  renderForm(){
+    return (
+      <table>
+        <tbody>
+          <RepairForm users={this.props.users} entity={this.state.entity} switchToViewMode={this.switchBackToButton}/>
+        </tbody>
+      </table>
+    );
+  }
+
+  render() {
+    if(this.state.showButton){
+      return this.renderShowButton();
+    }else{
+      return this.renderForm();
+    }
+  }
+}
+
 class Repairs extends React.Component{
   constructor(props) {
     super(props);
 
     this.state = {repairs: []};
     this.handleDelete = this.handleDelete.bind(this);
+    this.handleAddNew = this.handleAddNew.bind(this);
+  }
+
+  handleAddNew(entity){
+    var new_repairs = this.state.repairs.slice(0);
+    new_repairs.push(entity);
+
+    this.setState({repairs: new_repairs})
   }
 
   handleDelete(removed_id){
@@ -234,6 +293,7 @@ class Repairs extends React.Component{
             {content}
           </tbody>
         </table>
+        <AddNewRepair onSuccess={this.handleAddNew} users={this.state.users} />
       </div>
     );
   } 
