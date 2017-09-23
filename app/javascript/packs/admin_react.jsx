@@ -37,8 +37,8 @@ class Repairs extends React.Component{
     var content = this.state.repairs.map((entity) =>
       <tr key={entity.id}>
         <td>{entity.name}</td>
-        <td>{entity.complete}</td>
-        <td>{entity.approved}</td>
+        <td>{entity.complete.toString()}</td>
+        <td>{entity.approved.toString()}</td>
         <td>{entity.user_id}</td>
         <td>{entity.starts_at}</td>
       </tr>
