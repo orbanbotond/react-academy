@@ -19,6 +19,25 @@ export default class AdminView extends React.Component {
   }
 }
 
+class Repair extends React.Component{
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return (
+      <tr>
+        <td>{this.props.entity.name}</td>
+        <td>{this.props.entity.complete.toString()}</td>
+        <td>{this.props.entity.approved.toString()}</td>
+        <td>{this.props.entity.user_id}</td>
+        <td>{this.props.entity.starts_at}</td>
+        <td>Edit</td>
+      </tr>
+    );
+  }
+}
+
 class Repairs extends React.Component{
   constructor(props) {
     super(props);
@@ -35,13 +54,7 @@ class Repairs extends React.Component{
 
   render() {
     var content = this.state.repairs.map((entity) =>
-      <tr key={entity.id}>
-        <td>{entity.name}</td>
-        <td>{entity.complete.toString()}</td>
-        <td>{entity.approved.toString()}</td>
-        <td>{entity.user_id}</td>
-        <td>{entity.starts_at}</td>
-      </tr>
+      <Repair key={entity.id} entity={entity} />
     );
 
     return (
@@ -54,6 +67,7 @@ class Repairs extends React.Component{
               <th>Approved</th>
               <th>User</th>
               <th>Started At</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -62,5 +76,5 @@ class Repairs extends React.Component{
         </table>
       </div>
     );
-  }  
+  } 
 }
