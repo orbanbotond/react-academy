@@ -13,10 +13,10 @@
 ActiveRecord::Schema.define(version: 20170923082408) do
 
   create_table "repairs", force: :cascade do |t|
-    t.boolean "complete"
+    t.boolean "complete", default: false
     t.string "name"
     t.integer "user_id"
-    t.boolean "approved"
+    t.boolean "approved", default: false
     t.datetime "starts_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
