@@ -26,19 +26,15 @@ class Hello2 extends React.Component {
   render() {
     return (
       <div>
-        Hello world 2
+        Hello To The Small Auto Repair Shop.
       </div>
     );
   }
 }
 
-// document.addEventListener('DOMContentLoaded', () => {
-//   ReactDOM.render(
-//     <Hello name="React" />,
-//     document.body.appendChild(document.createElement('div')),
-//   )
-//   ReactDOM.render(
-//     <Hello2 name="React" />,
-//     document.body.appendChild(document.createElement('div')),
-//   )
-// })
+document.addEventListener('DOMContentLoaded', () => {
+  ReactDOM.render(
+    <Hello2 name="React" />,
+    document.body.appendChild(document.createElement('div')),
+  )
+})
