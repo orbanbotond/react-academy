@@ -29,6 +29,21 @@ class RepairForm extends React.Component{
     this.handleCompletedChange = this.handleCompletedChange.bind(this);
     this.handleApprovedChange = this.handleApprovedChange.bind(this);
     this.handleUserChange = this.handleUserChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  handleSubmit(event){
+    event.preventDefault();
+
+    $.ajax({
+      method: 'PATCH',
+      url: Routes.repair_path(this.state.id,'json'),
+      data: {repair: { name: this.state.name, complete: this.state.complete, approved: this.state.approved, user_id: this.state.user_id }}
+    }).done(( msg ) => {
+      alert( "Yeiyy" );
+    }).fail(function(msd){
+      alert( "Sorry, unauthorized!" );
+    });
   }
 
   handleUserChange(event){
@@ -68,6 +83,7 @@ class RepairForm extends React.Component{
           <td>
           </td>
           <td>
+            <input type="submit" value="Submit" onClick={this.handleSubmit} />
           </td>
         </tr>
 
