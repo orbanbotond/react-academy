@@ -1,5 +1,5 @@
 class RepairsController < ApplicationController
-  before_action :set_repair, only: [:show, :edit, :update, :destroy]
+  before_action :set_repair, only: [:show, :edit, :update, :destroy, :start]
   protect_from_forgery with: :null_session
 
   # GET /repairs
@@ -7,6 +7,17 @@ class RepairsController < ApplicationController
   def index
     @repairs = Repair.all
     @repairs = @repairs.where(user_id: params[:user_id]) if params[:user_id].present?
+  end
+
+  # PUT /repairs/1
+  # PUT /repairs/1.json
+  def start
+    if Repair.where('starts_at > ?', Time.zone.now - 1.hour).where.not(id: @repair.id).exists?
+      render status: 403
+    else
+      @repair.starts_at = Time.zone.now
+      @repair.save
+    end
   end
 
   # GET /repairs/1

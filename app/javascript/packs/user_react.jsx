@@ -132,6 +132,20 @@ class Repair extends React.Component {
 
     this.handleCommentAdded = this.handleCommentAdded.bind(this);
     this.handleComplete = this.handleComplete.bind(this);
+    this.handleStart = this.handleStart.bind(this);
+  }
+
+  handleStart(event){
+    event.preventDefault();
+
+    $.ajax({
+      method: 'PUT',
+      url: Routes.start_repair_path(this.state.id,'json')
+    }).done(( msg ) => {
+      this.setState( msg);
+    }).fail(function(msd){
+      alert( "Sorry, we need to wait for another Repair to be finished!" );
+    });
   }
 
   handleComplete(event){
@@ -161,10 +175,21 @@ class Repair extends React.Component {
       <li key={entity.id}>{entity.comment}</li>
     );
 
+    var completed_vdom = null;
+    if(this.state.complete){
+      completed_vdom = complete.toString();
+    }else{
+      if(starts_at){
+        completed_vdom = <input type="submit" value="Complete" onClick={this.handleComplete} />
+      }else{
+        completed_vdom = <input type="submit" value="Start" onClick={this.handleStart} />
+      }
+    }
+
     return (
       <tr>
         <td>{name}</td>
-        <td>{ this.state.complete ? complete.toString() : <input type="submit" value="Complete" onClick={this.handleComplete} /> }</td>
+        <td>{ completed_vdom }</td>
         <td>{approved.toString()}</td>
         <td>{starts_at}</td>
         <td>
