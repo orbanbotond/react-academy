@@ -7,15 +7,22 @@ export default class UserView extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {repairs: [], filter_complete: '0'};
+    this.state = {repairs: [], filter_for_complete: '0', filter_for_start_date_time: ''};
     this.handleLogout = this.handleLogout.bind(this);
-    this.handleFilterComplete = this.handleFilterComplete.bind(this);
+    this.handleFilterForCompleteChange = this.handleFilterForCompleteChange.bind(this);
+    this.handleFilterForStartDateTimeChange = this.handleFilterForStartDateTimeChange.bind(this);
   }
 
-  handleFilterComplete(event){
+  handleFilterForStartDateTimeChange(event){
     event.preventDefault();
 
-    this.setState({filter_complete: event.target.value});
+    this.setState({filter_for_start_date_time: event.target.value});
+  }
+
+  handleFilterForCompleteChange(event){
+    event.preventDefault();
+
+    this.setState({filter_for_complete: event.target.value});
   }
 
   handleLogout(event){
@@ -47,6 +54,18 @@ export default class UserView extends React.Component {
     });
   }
 
+  filter_by_start_date_time(source){
+    const date_check = new RegExp(this.state.filter_for_start_date_time, 'g');
+
+    return source.filter((repair) =>{
+      if(this.state.filter_for_start_date_time === ''){
+        return true;
+      }else{
+        return repair.starts_at && repair.starts_at.match(date_check);
+      }
+    });
+  }
+
   render() {
     var filtered_by_completeness = this.filter_by_completeness(this.state.repairs);
 
@@ -64,14 +83,17 @@ export default class UserView extends React.Component {
               <th>Name</th>
               <th>
                 Completed
-                <select onChange={this.handleFilterComplete}>
+                <select onChange={this.handleFilterForCompleteChange}>
                   <option value='0'>No filter</option>
                   <option value='1'>By Completed</option>
                   <option value='2'>By Uncompleted</option>
                 </select>
               </th>
               <th>Approved</th>
-              <th>Started At</th>
+              <th>
+                Started At
+                <input type="text" placeholder="No Filter" value={this.state.filter_for_start_date_time} onChange={this.handleFilterForStartDateTimeChange} />
+              </th>
               <th>Comments</th>
               <th></th>
             </tr>
