@@ -7,8 +7,15 @@ export default class UserView extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {repairs: []};
+    this.state = {repairs: [], complete_filter: '0'};
     this.handleLogout = this.handleLogout.bind(this);
+    this.handleFilterComplete = this.handleFilterComplete.bind(this);
+  }
+
+  handleFilterComplete(event){
+    event.preventDefault();
+
+    this.setState({complete_filter: event.target.value});
   }
 
   handleLogout(event){
@@ -27,7 +34,19 @@ export default class UserView extends React.Component {
   }
 
   render() {
-    var content = this.state.repairs.map((entity) =>
+    var shown_repairs = this.state.repairs.filter((repair) =>{
+      if(this.state.complete_filter === '0'){
+        return true;
+      }
+      if(this.state.complete_filter === '1'){
+        return repair.complete;
+      }
+      if(this.state.complete_filter === '2'){
+        return !repair.complete;
+      }
+    });
+
+    var content = shown_repairs.map((entity) =>
       <Repair key={entity.id} entity={entity} />
     );
 
@@ -39,7 +58,14 @@ export default class UserView extends React.Component {
           <thead>
             <tr>
               <th>Name</th>
-              <th>Completed</th>
+              <th>
+                Completed
+                <select onChange={this.handleFilterComplete}>
+                  <option value='0'>No filter</option>
+                  <option value='1'>By Completed</option>
+                  <option value='2'>By Uncompleted</option>
+                </select>
+              </th>
               <th>Approved</th>
               <th>Started At</th>
               <th>Comments</th>
