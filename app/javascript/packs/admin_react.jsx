@@ -331,8 +331,10 @@ class AddNewRepair extends React.Component{
   switchBackToButton(data){
     if (data.id){
       this.props.onSuccess(data);
+      this.setState({showButton: true, entity: {name:'', complete:false, approved: false, user_id: ''}});
+    }else{
+      this.setState({showButton: true, entity: data});
     }
-    this.setState({showButton: true, entity: data});
   }
 
   renderShowButton(){
