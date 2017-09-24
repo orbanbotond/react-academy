@@ -64,7 +64,7 @@ export default class Login extends React.Component {
   switchToAdminView(user){
     ReactDOM.render(
       <AdminView user={user}/>,
-      document.getElementById('content'),
+      document.getElementById('content')
     )
   }
 
