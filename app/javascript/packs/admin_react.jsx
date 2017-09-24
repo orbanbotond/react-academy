@@ -268,6 +268,7 @@ class Repair extends React.Component{
 
   switchToViewMode(repair) {
     this.setState({editMode: false, repair: repair});
+    this.props.onChange(repair);
   }
 
   retrieve_user_name(user_id){
@@ -361,17 +362,39 @@ class Repairs extends React.Component{
   constructor(props) {
     super(props);
 
-    this.state = {repairs: [], filter_complete: '0'};
+    this.state = {repairs: [], filter_by_completeness: '0', filter_by_user: '-1'};
     this.handleDelete = this.handleDelete.bind(this);
     this.handleAddNew = this.handleAddNew.bind(this);
     this.handleSwitchToUserManagement = this.handleSwitchToUserManagement.bind(this);
-    this.handleFilterComplete = this.handleFilterComplete.bind(this);
+    this.handleFilterByCompletenessChange = this.handleFilterByCompletenessChange.bind(this);
+    this.handleFilterByUserChange = this.handleFilterByUserChange.bind(this);
+    this.handleRepairChange = this.handleRepairChange.bind(this);
   }
 
-  handleFilterComplete(event){
+  handleRepairChange(newEntity){
+
+    var entities = this.state.repairs.slice(0);
+    var new_entities = entities.map((entity) => {
+      if(entity.id === newEntity.id){
+        return newEntity;
+      }else{
+        return entity;
+      }
+    });
+
+    this.setState({repairs: new_entities})
+  }
+
+  handleFilterByUserChange(event){
     event.preventDefault();
 
-    this.setState({filter_complete: event.target.value});
+    this.setState({filter_by_user: event.target.value});
+  }
+
+  handleFilterByCompletenessChange(event){
+    event.preventDefault();
+
+    this.setState({filter_by_completeness: event.target.value});
   }
 
   handleSwitchToUserManagement(event){
@@ -405,23 +428,42 @@ class Repairs extends React.Component{
 
   filter_by_completeness(source){
     return source.filter((repair) =>{
-      if(this.state.filter_complete === '0'){
+      if(this.state.filter_by_completeness === '0'){
         return true;
       }
-      if(this.state.filter_complete === '1'){
+      if(this.state.filter_by_completeness === '1'){
         return repair.complete;
       }
-      if(this.state.filter_complete === '2'){
+      if(this.state.filter_by_completeness === '2'){
         return !repair.complete;
       }
     });
   }
 
-  render() {
-    var filtered_after_completeness = this.filter_by_completeness(this.state.repairs);
+  filter_by_user(source){
+    return source.filter((repair) =>{
+      if(this.state.filter_by_user === '-1'){
+        return true;
+      }else{
+        return repair.user_id === parseInt(this.state.filter_by_user);
+      }
+    });
+  }
 
-    var content = filtered_after_completeness.map((entity) =>
-      <Repair key={entity.id} entity={entity} users={this.state.users} onDelete={this.handleDelete} />
+  render() {
+    if(!this.state.users){
+      return null;
+    }
+
+    var filtered_by_completeness = this.filter_by_completeness(this.state.repairs);
+    var filtered_by_user = this.filter_by_user(filtered_by_completeness);
+
+    var content = filtered_by_user.map((entity) =>
+      <Repair key={entity.id} entity={entity} users={this.state.users} onDelete={this.handleDelete} onChange={this.handleRepairChange} />
+    );
+
+    var filter_by_user_vdom = this.state.users.map((user) =>
+      <option key={user.id} value={user.id}>{user.name}</option>
     );
 
     return (
@@ -433,14 +475,20 @@ class Repairs extends React.Component{
               <th>Name</th>
               <th>
                 Completed
-                <select onChange={this.handleFilterComplete}>
+                <select onChange={this.handleFilterByCompletenessChange}>
                   <option value='0'>No filter</option>
                   <option value='1'>By Completed</option>
                   <option value='2'>By Uncompleted</option>
                 </select>
               </th>
               <th>Approved</th>
-              <th>User</th>
+              <th>
+                User
+                <select onChange={this.handleFilterByUserChange}>
+                  <option value='-1'>No filter</option>
+                  {filter_by_user_vdom}
+                </select>
+              </th>
               <th>Started At</th>
               <th>Comments</th>
               <th></th>
