@@ -136,6 +136,75 @@ class RepairForm extends React.Component{
   }
 }
 
+class AddNewComment extends React.Component{
+  constructor(props) {
+    super(props);
+
+    this.state = { editMode: false, comment: '' };
+    this.handleSwitchToEditMode = this.handleSwitchToEditMode.bind(this);
+    this.handleCommentChange = this.handleCommentChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleCancel = this.handleCancel.bind(this);
+  }
+
+  handleSwitchToEditMode(){
+    this.setState({ editMode: true });
+  }
+
+  handleCancel(){
+    this.switchToViewMode();
+  }
+
+  switchToViewMode(){
+    this.setState({ editMode: false });
+  }
+
+  handleCommentChange(event){
+    this.setState({ comment: event.target.value });
+  }
+
+  handleSubmit(){
+    $.ajax({
+      method: 'POST',
+      url: Routes.comments_path('json'),
+      data: {comment: { comment: this.state.comment, repair_id: this.props.entity.id }}
+    }).done(( msg ) => {
+      this.switchToViewMode(msg);
+      this.props.onSuccess(msg);
+    }).fail(function(msd){
+      alert( "Sorry, unauthorized!" );
+    });
+  }
+
+  render() {
+    const { editMode } = this.state;
+
+    if (editMode) {
+      return this.renderForm();
+    } else {
+      return this.renderViewMode();
+    }
+  }
+
+  renderForm() {
+    return (
+      <div>
+        <input type="text" placeholder="Add New Comment Here" value={this.state.comment} onChange={this.handleCommentChange} />
+        <button onClick={this.handleSubmit}>Save Comment</button>
+        <button onClick={this.handleCancel}>Cancel</button>
+      </div>
+    );
+  }
+
+  renderViewMode(){
+    return (
+      <div>
+        <button onClick={this.handleSwitchToEditMode}>Add New Comment</button>
+      </div>
+    );
+  }
+}
+
 class Repair extends React.Component{
   constructor(props) {
     super(props);
@@ -145,6 +214,7 @@ class Repair extends React.Component{
     this.switchToEditMode = this.switchToEditMode.bind(this);
     this.switchToViewMode = this.switchToViewMode.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
+    this.handleCommentAdded = this.handleCommentAdded.bind(this);
   }
 
   handleDelete(){
@@ -183,6 +253,12 @@ class Repair extends React.Component{
     }
   }
 
+  handleCommentAdded(comment){
+    var repair = this.state.repair;
+    repair.comments.push(comment);
+    this.setState({repair: repair});
+  }
+
   renderRepair() {
     const { comments, complete, approved, name, user_id, starts_at } = this.state.repair;
     const user_name = this.retrieve_user_name(user_id);
@@ -200,6 +276,7 @@ class Repair extends React.Component{
         <td>
           <ul>
             {comment_vdom}
+            <AddNewComment entity={this.state.repair} onSuccess={this.handleCommentAdded}/>
           </ul>
         </td>
         <td><button onClick={this.switchToEditMode} >Edit</button></td>
