@@ -128,19 +128,34 @@ class Repair extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = { repair: this.props.entity };
+    this.state = this.props.entity;
 
     this.handleCommentAdded = this.handleCommentAdded.bind(this);
+    this.handleComplete = this.handleComplete.bind(this);
+  }
+
+  handleComplete(event){
+    event.preventDefault();
+
+    $.ajax({
+      method: 'PATCH',
+      url: Routes.repair_path(this.state.id,'json'),
+      data: {repair: { complete: true }}
+    }).done(( msg ) => {
+      this.setState( msg);
+    }).fail(function(msd){
+      alert( "Sorry, unauthorized!" );
+    });
   }
 
   handleCommentAdded(comment){
-    var repair = this.state.repair;
+    var repair = this.state;
     repair.comments.push(comment);
     this.setState({repair: repair});
   }
 
   render() {
-    const {name, approved, complete, starts_at, comments } = this.state.repair;
+    const {name, approved, complete, starts_at, comments } = this.state;
 
     const comment_vdom = comments.map((entity) =>
       <li key={entity.id}>{entity.comment}</li>
@@ -149,16 +164,18 @@ class Repair extends React.Component {
     return (
       <tr>
         <td>{name}</td>
-        <td>{complete.toString()}</td>
+        <td>{ this.state.complete ? complete.toString() : <input type="submit" value="Complete" onClick={this.handleComplete} /> }</td>
         <td>{approved.toString()}</td>
         <td>{starts_at}</td>
         <td>
           <ul>
             {comment_vdom}
-            <AddNewComment entity={this.state.repair} onSuccess={this.handleCommentAdded}/>
+            <AddNewComment entity={this.state} onSuccess={this.handleCommentAdded}/>
           </ul>
         </td>
-        <td></td>
+        <td>
+          
+        </td>
       </tr>
     );
   }
