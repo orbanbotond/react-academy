@@ -9,6 +9,7 @@ Rails.application.routes.draw do
 
   resources :users do
     get 'login', on: :collection
+    post 'register', on: :collection
   end
 
 end

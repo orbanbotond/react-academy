@@ -12,6 +12,17 @@ class UsersController < ApplicationController
     end
   end
 
+  # POST /users.json
+  def register
+    if User.exists? name: params[:name]
+      @user = User.new name: params[:name], password: params[:password]
+      render status: 403
+    else
+      @user = User.create name: params[:name], password: params[:password]
+      render status: 201
+    end
+  end
+
   # GET /users.json
   def index
     @users = User.all
