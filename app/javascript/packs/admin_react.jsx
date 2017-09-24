@@ -386,11 +386,46 @@ class UserForm extends React.Component{
 class AddNewUser extends React.Component{
   constructor(props) {
     super(props);
+
+    this.state = {showButton: true, entity: {name:'', admin: false}};
+    this.handleAddNew = this.handleAddNew.bind(this);
+    this.switchBackToButton = this.switchBackToButton.bind(this);
+  }
+
+  handleAddNew(event){
+    event.preventDefault();
+
+    this.setState({showButton: false});
+  }
+
+  switchBackToButton(data){
+    if (data.id){
+      this.props.onSuccess(data);
+    }
+    this.setState({showButton: true, entity: data});
+  }
+
+  renderShowButton(){
+    return <button onClick={this.handleAddNew}>Add New User</button>;
+  }
+
+  renderForm(){
+    return (
+      <table>
+        <tbody>
+          <UserForm entity={this.state.entity} switchToViewMode={this.switchBackToButton}/>
+        </tbody>
+      </table>
+    );
   }
 
   render() {
-    return <div />;
-  }  
+    if(this.state.showButton){
+      return this.renderShowButton();
+    }else{
+      return this.renderForm();
+    }
+  }
 }
 
 class User extends React.Component{
