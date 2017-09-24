@@ -6,6 +6,7 @@ class RepairsController < ApplicationController
   # GET /repairs.json
   def index
     @repairs = Repair.all
+    @repairs = @repairs.where(user_id: params[:user_id]) if params[:user_id].present?
   end
 
   # GET /repairs/1

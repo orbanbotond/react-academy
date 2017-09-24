@@ -1,3 +1,4 @@
+import Login from './login_react'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
@@ -20,7 +21,7 @@ export default class UserView extends React.Component {
   }
 
   componentWillMount() {
-    $.ajax({ url: Routes.repairs_path('json')}).done((msg)=>{
+    $.ajax({ url: Routes.repairs_path('json', {user_id: this.props.user.id})}).done((msg)=>{
         this.setState({repairs: msg})
       });
   }
