@@ -361,10 +361,17 @@ class Repairs extends React.Component{
   constructor(props) {
     super(props);
 
-    this.state = {repairs: []};
+    this.state = {repairs: [], filter_complete: '0'};
     this.handleDelete = this.handleDelete.bind(this);
     this.handleAddNew = this.handleAddNew.bind(this);
     this.handleSwitchToUserManagement = this.handleSwitchToUserManagement.bind(this);
+    this.handleFilterComplete = this.handleFilterComplete.bind(this);
+  }
+
+  handleFilterComplete(event){
+    event.preventDefault();
+
+    this.setState({filter_complete: event.target.value});
   }
 
   handleSwitchToUserManagement(event){
@@ -396,8 +403,24 @@ class Repairs extends React.Component{
       });
   }
 
+  filter_by_completeness(source){
+    return source.filter((repair) =>{
+      if(this.state.filter_complete === '0'){
+        return true;
+      }
+      if(this.state.filter_complete === '1'){
+        return repair.complete;
+      }
+      if(this.state.filter_complete === '2'){
+        return !repair.complete;
+      }
+    });
+  }
+
   render() {
-    var content = this.state.repairs.map((entity) =>
+    var filtered_after_completeness = this.filter_by_completeness(this.state.repairs);
+
+    var content = filtered_after_completeness.map((entity) =>
       <Repair key={entity.id} entity={entity} users={this.state.users} onDelete={this.handleDelete} />
     );
 
@@ -408,7 +431,14 @@ class Repairs extends React.Component{
           <thead>
             <tr>
               <th>Name</th>
-              <th>Completed</th>
+              <th>
+                Completed
+                <select onChange={this.handleFilterComplete}>
+                  <option value='0'>No filter</option>
+                  <option value='1'>By Completed</option>
+                  <option value='2'>By Uncompleted</option>
+                </select>
+              </th>
               <th>Approved</th>
               <th>User</th>
               <th>Started At</th>
