@@ -13,6 +13,7 @@ export default class AdminView extends React.Component {
         </p>
         <div>
           <Repairs />
+          <Users />
         </div>
       </div>
     );
@@ -169,7 +170,7 @@ class Repair extends React.Component{
   }
 
   retrieve_user_name(user_id){
-    if(user_id){
+    if(user_id && this.props.users){
       return this.props.users.filter((user) =>{
         return user.id === user_id;
       })[0].name;
@@ -298,3 +299,199 @@ class Repairs extends React.Component{
     );
   } 
 }
+
+class UserForm extends React.Component{
+  constructor(props) {
+    super(props);
+
+    this.state = this.props.entity;
+
+    this.handleNameChange = this.handleNameChange.bind(this);
+    this.handleAdminChange = this.handleAdminChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleCancel = this.handleCancel.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
+  }
+
+  handleDelete(){
+    event.preventDefault();
+
+    $.ajax({
+      method: 'DELETE',
+      url: Routes.user_path(this.state.id,'json')
+    }).done(( msg ) => {
+      this.props.onDelete(this.state.id);
+    }).fail(function(msd){
+      alert( "Sorry, unauthorized!" );
+    });
+  }
+
+  handleCancel(){
+    event.preventDefault();
+    const entity = (this.state.id) ? this.props.entity : this.state;
+
+    this.props.switchToViewMode(entity);
+  }
+
+  handleSubmit(event){
+    event.preventDefault();
+
+    const url = (this.state.id) ? Routes.user_path(this.state.id,'json') : Routes.users_path('json');
+    const method = (this.state.id) ? 'PATCH' : 'POST';
+
+    $.ajax({
+      method: method,
+      url: url,
+      data: {user: { name: this.state.name, admin: this.state.admin }}
+    }).done(( msg ) => {
+      this.props.switchToViewMode(msg);
+    }).fail(function(msd){
+      alert( "Sorry, unauthorized!" );
+    });
+  }
+
+  handleNameChange(event){
+    this.setState({name: event.target.value});
+  }
+
+  handleAdminChange(event){
+    const target = event.target;
+    const value = target.checked;
+    this.setState({admin: value});
+  }
+
+  render(){
+    const { name, admin } = this.state;
+
+    var delete_button = this.props.onDelete ? <input type="submit" value="Delete" onClick={this.handleDelete} /> : '';
+
+    return (
+      <tr>
+        <td>
+          <input type="text" placeholder="Name" value={name} onChange={this.handleNameChange} />
+        </td>
+        <td>
+          <input type="checkbox" checked={admin} onChange={this.handleAdminChange} />
+        </td>
+        <td>
+          <input type="submit" value="Submit" onClick={this.handleSubmit} />
+          <input type="submit" value="Cancel" onClick={this.handleCancel} />
+          {delete_button}
+        </td>
+      </tr>
+    )
+  }
+}
+
+class AddNewUser extends React.Component{
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return <div />;
+  }  
+}
+
+class User extends React.Component{
+  constructor(props) {
+    super(props);
+
+    this.state = { editMode: false, entity: this.props.entity };
+
+    this.switchToEditMode = this.switchToEditMode.bind(this);
+    this.switchToViewMode = this.switchToViewMode.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
+  }
+
+  handleDelete(){
+    this.props.onDelete(this.state.entity.id);
+  }
+
+  render() {
+    const { editMode } = this.state;
+
+    if (editMode) {
+      return this.renderForm();
+    } else {
+      return this.renderEntity();
+    }
+  }
+
+  renderForm() {
+    return <UserForm entity={this.props.entity} switchToViewMode={this.switchToViewMode} onDelete={this.handleDelete} />;
+  }
+
+  switchToEditMode() {
+    this.setState({editMode: true});
+  }
+
+  switchToViewMode(entity) {
+    this.setState({editMode: false, entity: entity});
+  }
+
+  renderEntity() {
+    const { name, admin } = this.state.entity;
+    return (
+      <tr>
+        <td>{name}</td>
+        <td>{admin.toString()}</td>
+        <td><button onClick={this.switchToEditMode} >Edit</button></td>
+      </tr>
+    );
+  }
+}
+
+class Users extends React.Component{
+  constructor(props) {
+    super(props);
+
+    this.state = {entities: []};
+    this.handleDelete = this.handleDelete.bind(this);
+    this.handleAddNew = this.handleAddNew.bind(this);
+  }
+
+  handleAddNew(entity){
+    var entities = this.state.entities.slice(0);
+    entities.push(entity);
+
+    this.setState({entities: entities})
+  }
+
+  handleDelete(removed_id){
+    var new_entities = this.state.entities.filter((entity) => { return entity.id != removed_id });
+
+    this.setState({entities: new_entities})
+  }
+
+  componentWillMount() {
+    $.ajax({ url: Routes.users_path('json')}).done((msg)=>{
+        this.setState({entities: msg})
+      });
+  }
+
+  render() {
+    var content = this.state.entities.map((entity) =>
+      <User key={entity.id} entity={entity} onDelete={this.handleDelete} />
+    );
+
+    return (
+      <div>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Admin</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {content}
+          </tbody>
+        </table>
+        <AddNewUser onSuccess={this.handleAddNew} users={this.state.users} />
+      </div>
+    );
+  } 
+}
+
