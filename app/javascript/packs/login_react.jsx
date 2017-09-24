@@ -64,7 +64,7 @@ class Login extends React.Component {
   switchToAdminView(user){
     ReactDOM.render(
       <AdminView user={user}/>,
-      document.body.appendChild(document.createElement('div')),
+      document.getElementById('content'),
     )
   }
 
@@ -80,6 +80,6 @@ class Login extends React.Component {
 document.addEventListener('DOMContentLoaded', () => {
   ReactDOM.render(
     <Login />,
-    document.body.appendChild(document.createElement('div')),
+    document.getElementById('content')
   )
 })
