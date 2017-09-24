@@ -364,17 +364,17 @@ class Repairs extends React.Component{
   constructor(props) {
     super(props);
 
-    this.state = {repairs: [], filter_by_completeness: '0', filter_by_user: '-1'};
+    this.state = {repairs: [], filter_for_completeness: '0', filter_for_user: '-1', filter_for_start_date_time: ''};
     this.handleDelete = this.handleDelete.bind(this);
     this.handleAddNew = this.handleAddNew.bind(this);
     this.handleSwitchToUserManagement = this.handleSwitchToUserManagement.bind(this);
-    this.handleFilterByCompletenessChange = this.handleFilterByCompletenessChange.bind(this);
-    this.handleFilterByUserChange = this.handleFilterByUserChange.bind(this);
+    this.handleFilterForCompletenessChange = this.handleFilterForCompletenessChange.bind(this);
+    this.handleFilterForUserChange = this.handleFilterForUserChange.bind(this);
+    this.handleFilterForStartDateTimeChange = this.handleFilterForStartDateTimeChange.bind(this);
     this.handleRepairChange = this.handleRepairChange.bind(this);
   }
 
   handleRepairChange(newEntity){
-
     var entities = this.state.repairs.slice(0);
     var new_entities = entities.map((entity) => {
       if(entity.id === newEntity.id){
@@ -387,16 +387,22 @@ class Repairs extends React.Component{
     this.setState({repairs: new_entities})
   }
 
-  handleFilterByUserChange(event){
+  handleFilterForStartDateTimeChange(event){
     event.preventDefault();
 
-    this.setState({filter_by_user: event.target.value});
+    this.setState({filter_for_start_date_time: event.target.value});
   }
 
-  handleFilterByCompletenessChange(event){
+  handleFilterForUserChange(event){
     event.preventDefault();
 
-    this.setState({filter_by_completeness: event.target.value});
+    this.setState({filter_for_user: event.target.value});
+  }
+
+  handleFilterForCompletenessChange(event){
+    event.preventDefault();
+
+    this.setState({filter_for_completeness: event.target.value});
   }
 
   handleSwitchToUserManagement(event){
@@ -430,13 +436,13 @@ class Repairs extends React.Component{
 
   filter_by_completeness(source){
     return source.filter((repair) =>{
-      if(this.state.filter_by_completeness === '0'){
+      if(this.state.filter_for_completeness === '0'){
         return true;
       }
-      if(this.state.filter_by_completeness === '1'){
+      if(this.state.filter_for_completeness === '1'){
         return repair.complete;
       }
-      if(this.state.filter_by_completeness === '2'){
+      if(this.state.filter_for_completeness === '2'){
         return !repair.complete;
       }
     });
@@ -444,10 +450,22 @@ class Repairs extends React.Component{
 
   filter_by_user(source){
     return source.filter((repair) =>{
-      if(this.state.filter_by_user === '-1'){
+      if(this.state.filter_for_user === '-1'){
         return true;
       }else{
-        return repair.user_id === parseInt(this.state.filter_by_user);
+        return repair.user_id === parseInt(this.state.filter_for_user);
+      }
+    });
+  }
+
+  filter_by_start_date_time(source){
+    const date_check = new RegExp(this.state.filter_for_start_date_time, 'g');
+
+    return source.filter((repair) =>{
+      if(this.state.filter_for_start_date_time === ''){
+        return true;
+      }else{
+        return repair.starts_at && repair.starts_at.match(date_check);
       }
     });
   }
@@ -459,8 +477,9 @@ class Repairs extends React.Component{
 
     var filtered_by_completeness = this.filter_by_completeness(this.state.repairs);
     var filtered_by_user = this.filter_by_user(filtered_by_completeness);
+    var filtered_by_date_time = this.filter_by_start_date_time(filtered_by_user);
 
-    var content = filtered_by_user.map((entity) =>
+    var content = filtered_by_date_time.map((entity) =>
       <Repair key={entity.id} entity={entity} users={this.state.users} onDelete={this.handleDelete} onChange={this.handleRepairChange} />
     );
 
@@ -477,7 +496,7 @@ class Repairs extends React.Component{
               <th>Name</th>
               <th>
                 Completed
-                <select onChange={this.handleFilterByCompletenessChange}>
+                <select onChange={this.handleFilterForCompletenessChange}>
                   <option value='0'>No filter</option>
                   <option value='1'>By Completed</option>
                   <option value='2'>By Uncompleted</option>
@@ -486,12 +505,15 @@ class Repairs extends React.Component{
               <th>Approved</th>
               <th>
                 User
-                <select onChange={this.handleFilterByUserChange}>
+                <select onChange={this.handleFilterForUserChange}>
                   <option value='-1'>No filter</option>
                   {filter_by_user_vdom}
                 </select>
               </th>
-              <th>Started At</th>
+              <th>
+                Started At
+                <input type="text" placeholder="No Filter" value={this.state.filter_for_start_date_time} onChange={this.handleFilterForStartDateTimeChange} />
+              </th>
               <th>Comments</th>
               <th></th>
             </tr>
