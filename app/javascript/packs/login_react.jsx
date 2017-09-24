@@ -71,10 +71,9 @@ class Login extends React.Component {
   switchToUserView(user){
     ReactDOM.render(
       <UserView user={user}/>,
-      document.body.appendChild(document.createElement('div')),
+      document.getElementById('content')
     )
   }
-
 }
 
 document.addEventListener('DOMContentLoaded', () => {

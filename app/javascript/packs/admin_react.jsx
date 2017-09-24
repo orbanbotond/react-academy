@@ -3,17 +3,31 @@ import React from 'react'
 export default class AdminView extends React.Component {
   constructor(props) {
     super(props);
+
+    this.state = {show_repairs: true};
+
+    this.handleSwitchToRepairs = this.handleSwitchToRepairs.bind(this);
+    this.handleSwitchToUsers = this.handleSwitchToUsers.bind(this);
+  }
+
+  handleSwitchToRepairs(){
+    this.setState({show_repairs: true});
+  }
+
+  handleSwitchToUsers(){
+    this.setState({show_repairs: false});
   }
 
   render() {
+    var content = this.state.show_repairs ? <Repairs onSwitchToUsers={this.handleSwitchToUsers}/> : <Users onSwitchToRepairs={this.handleSwitchToRepairs}/>;
+
     return (
       <div >
         <p>
           Hey! welcome admin: {this.props.user.name}
         </p>
         <div>
-          <Repairs />
-          <Users />
+          {content}
         </div>
       </div>
     );
@@ -337,6 +351,13 @@ class Repairs extends React.Component{
     this.state = {repairs: []};
     this.handleDelete = this.handleDelete.bind(this);
     this.handleAddNew = this.handleAddNew.bind(this);
+    this.handleSwitchToUserManagement = this.handleSwitchToUserManagement.bind(this);
+  }
+
+  handleSwitchToUserManagement(event){
+    event.preventDefault();
+
+    this.props.onSwitchToUsers();
   }
 
   handleAddNew(entity){
@@ -369,6 +390,7 @@ class Repairs extends React.Component{
 
     return (
       <div>
+        <a href='#' onClick={this.handleSwitchToUserManagement}>Switch To User Management</a>
         <table>
           <thead>
             <tr>
@@ -575,6 +597,13 @@ class Users extends React.Component{
     this.state = {entities: []};
     this.handleDelete = this.handleDelete.bind(this);
     this.handleAddNew = this.handleAddNew.bind(this);
+    this.handleSwitchToRepairManagement = this.handleSwitchToRepairManagement.bind(this);
+  }
+
+  handleSwitchToRepairManagement(event){
+    event.preventDefault();
+
+    this.props.onSwitchToRepairs();
   }
 
   handleAddNew(entity){
@@ -603,6 +632,7 @@ class Users extends React.Component{
 
     return (
       <div>
+        <a href='#' onClick={this.handleSwitchToRepairManagement}>Switch To Repair Management</a>
         <table>
           <thead>
             <tr>
