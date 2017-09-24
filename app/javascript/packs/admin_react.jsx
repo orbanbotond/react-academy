@@ -123,6 +123,10 @@ class RepairForm extends React.Component{
           </select>
         </td>
         <td>
+        </td>
+        <td>
+        </td>
+        <td>
           <input type="submit" value="Submit" onClick={this.handleSubmit} />
           <input type="submit" value="Cancel" onClick={this.handleCancel} />
           {delete_button}
@@ -180,8 +184,12 @@ class Repair extends React.Component{
   }
 
   renderRepair() {
-    const { complete, approved, name, user_id, starts_at } = this.state.repair;
+    const { comments, complete, approved, name, user_id, starts_at } = this.state.repair;
     const user_name = this.retrieve_user_name(user_id);
+    const comment_vdom = comments.map((entity) =>
+      <li key={entity.id}>{entity.comment}</li>
+    );
+
     return (
       <tr>
         <td>{name}</td>
@@ -189,6 +197,11 @@ class Repair extends React.Component{
         <td>{approved.toString()}</td>
         <td>{user_name}</td>
         <td>{starts_at}</td>
+        <td>
+          <ul>
+            {comment_vdom}
+          </ul>
+        </td>
         <td><button onClick={this.switchToEditMode} >Edit</button></td>
       </tr>
     );
@@ -287,6 +300,7 @@ class Repairs extends React.Component{
               <th>Approved</th>
               <th>User</th>
               <th>Started At</th>
+              <th>Comments</th>
               <th></th>
             </tr>
           </thead>
