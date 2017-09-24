@@ -1,4 +1,6 @@
+import Login from './login_react'
 import React from 'react'
+import ReactDOM from 'react-dom'
 
 export default class AdminView extends React.Component {
   constructor(props) {
@@ -8,6 +10,16 @@ export default class AdminView extends React.Component {
 
     this.handleSwitchToRepairs = this.handleSwitchToRepairs.bind(this);
     this.handleSwitchToUsers = this.handleSwitchToUsers.bind(this);
+    this.handleLogout = this.handleLogout.bind(this);
+  }
+
+  handleLogout(event){
+    event.preventDefault();
+
+    ReactDOM.render(
+      <Login />,
+      document.getElementById('content')
+    )
   }
 
   handleSwitchToRepairs(){
@@ -26,6 +38,7 @@ export default class AdminView extends React.Component {
         <p>
           Hey! welcome admin: {this.props.user.name}
         </p>
+        <a href='#' onClick={this.handleLogout}>Logout</a>
         <div>
           {content}
         </div>
