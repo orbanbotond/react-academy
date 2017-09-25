@@ -1,45 +1,45 @@
-import Login from './login_react'
-import React from 'react'
-import ReactDOM from 'react-dom'
+import React from 'react';
+import ReactDOM from 'react-dom';
 import axios from 'axios';
+import Login from './login_react';
 
 export default class AdminView extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {show_repairs: true};
+    this.state = { show_repairs: true };
 
     this.handleSwitchToRepairs = this.handleSwitchToRepairs.bind(this);
     this.handleSwitchToUsers = this.handleSwitchToUsers.bind(this);
     this.handleLogout = this.handleLogout.bind(this);
   }
 
-  handleLogout(event){
+  handleLogout(event) {
     event.preventDefault();
 
     ReactDOM.render(
       <Login />,
       document.getElementById('content')
-    )
+    );
   }
 
-  handleSwitchToRepairs(){
-    this.setState({show_repairs: true});
+  handleSwitchToRepairs() {
+    this.setState({ show_repairs: true });
   }
 
-  handleSwitchToUsers(){
-    this.setState({show_repairs: false});
+  handleSwitchToUsers() {
+    this.setState({ show_repairs: false });
   }
 
   render() {
-    var content = this.state.show_repairs ? <Repairs onSwitchToUsers={this.handleSwitchToUsers}/> : <Users onSwitchToRepairs={this.handleSwitchToRepairs}/>;
+    let content = this.state.show_repairs ? <Repairs onSwitchToUsers={this.handleSwitchToUsers} /> : <Users onSwitchToRepairs={this.handleSwitchToRepairs} />;
 
     return (
       <div >
         <p>
           Hey! welcome admin: {this.props.user.name}
         </p>
-        <a href='#' onClick={this.handleLogout}>Logout</a>
+        <a href="#" onClick={this.handleLogout}>Logout</a>
         <div>
           {content}
         </div>
@@ -48,7 +48,7 @@ export default class AdminView extends React.Component {
   }
 }
 
-class RepairForm extends React.Component{
+class RepairForm extends React.Component {
   constructor(props) {
     super(props);
 
@@ -63,10 +63,10 @@ class RepairForm extends React.Component{
     this.handleDelete = this.handleDelete.bind(this);
   }
 
-  handleDelete(){
+  handleDelete() {
     event.preventDefault();
 
-    axios.delete( Routes.repair_path(this.state.id,'json')
+    axios.delete( Routes.repair_path(this.state.id, 'json')
       ).then((response) => {
         var data = response.data;
         this.props.onDelete(this.state.id);
@@ -75,14 +75,14 @@ class RepairForm extends React.Component{
     });
   }
 
-  handleCancel(){
+  handleCancel() {
     event.preventDefault();
     const entity = (this.state.id) ? this.props.entity : this.state;
 
     this.props.switchToViewMode(entity);
   }
 
-  handleSubmit(event){
+  handleSubmit(event) {
     event.preventDefault();
 
     const url = (this.state.id) ? Routes.repair_path(this.state.id,'json') : Routes.repairs_path('json');
@@ -91,7 +91,7 @@ class RepairForm extends React.Component{
     axios({
       method: method,
       url: url,
-      data: {repair: { name: this.state.name, complete: this.state.complete, approved: this.state.approved, user_id: this.state.user_id }}
+      data: { repair: { name: this.state.name, complete: this.state.complete, approved: this.state.approved, user_id: this.state.user_id } }
     }).then((response) => {
       var data = response.data;
       this.props.switchToViewMode(data);
@@ -100,29 +100,29 @@ class RepairForm extends React.Component{
     });
   }
 
-  handleUserChange(event){
+  handleUserChange(event) {
     var value = event.target.value === 'null' ? null : parseInt(event.target.value);
-    this.setState({user_id: value});
+    this.setState({ user_id: value });
   }
 
-  handleNameChange(event){
-    this.setState({name: event.target.value});
+  handleNameChange(event) {
+    this.setState({ name: event.target.value});
   }
 
-  handleCompletedChange(event){
+  handleCompletedChange(event) {
     const target = event.target;
     const value = target.checked;
-    this.setState({complete: value});
-    if(!value){
-      this.setState({approved: false});
+    this.setState({ complete: value });
+    if (!value) {
+      this.setState({ approved: false });
     }
   }
 
-  handleApprovedChange(event){
-    this.setState({approved: event.target.checked});
+  handleApprovedChange(event) {
+    this.setState({ approved: event.target.checked });
   }
 
-  render(){
+  render() {
     const { complete, approved, name, user_id } = this.state;
 
     var options_for_user = this.props.users.map((user) =>
@@ -164,7 +164,7 @@ class RepairForm extends React.Component{
   }
 }
 
-class AddNewComment extends React.Component{
+class AddNewComment extends React.Component {
   constructor(props) {
     super(props);
 
@@ -175,32 +175,32 @@ class AddNewComment extends React.Component{
     this.handleCancel = this.handleCancel.bind(this);
   }
 
-  handleSwitchToEditMode(){
+  handleSwitchToEditMode() {
     this.setState({ editMode: true });
   }
 
-  handleCancel(){
+  handleCancel() {
     this.switchToViewMode();
   }
 
-  switchToViewMode(){
+  switchToViewMode() {
     this.setState({ editMode: false });
   }
 
-  handleCommentChange(event){
+  handleCommentChange(event) {
     this.setState({ comment: event.target.value });
   }
 
-  handleSubmit(){
+  handleSubmit() {
     axios({
       method: 'POST',
       url: Routes.comments_path('json'),
-      data: {comment: { comment: this.state.comment, repair_id: this.props.entity.id }}
+      data: {comment: { comment: this.state.comment, repair_id: this.props.entity.id } }
     }).then((response) => {
       var data = response.data;
       this.switchToViewMode(data);
       this.props.onSuccess(data);
-    }).catch(function(msg){
+    }).catch(function(msg) {
       alert( "Sorry, unauthorized!" );
     });
   }
@@ -225,7 +225,7 @@ class AddNewComment extends React.Component{
     );
   }
 
-  renderViewMode(){
+  renderViewMode() {
     return (
       <div>
         <button onClick={this.handleSwitchToEditMode}>Add New Comment</button>
@@ -234,7 +234,7 @@ class AddNewComment extends React.Component{
   }
 }
 
-class Repair extends React.Component{
+class Repair extends React.Component {
   constructor(props) {
     super(props);
 
@@ -246,7 +246,7 @@ class Repair extends React.Component{
     this.handleCommentAdded = this.handleCommentAdded.bind(this);
   }
 
-  handleDelete(){
+  handleDelete() {
     this.props.onDelete(this.state.repair.id);
   }
 
@@ -273,7 +273,7 @@ class Repair extends React.Component{
     this.props.onChange(repair);
   }
 
-  retrieve_user_name(user_id){
+  retrieveUserName(user_id) {
     if(user_id && this.props.users){
       return this.props.users.filter((user) =>{
         return user.id === user_id;
@@ -283,7 +283,7 @@ class Repair extends React.Component{
     }
   }
 
-  handleCommentAdded(comment){
+  handleCommentAdded(comment) {
     var repair = this.state.repair;
     repair.comments.push(comment);
     this.setState({repair: repair});
@@ -291,7 +291,7 @@ class Repair extends React.Component{
 
   renderRepair() {
     const { comments, complete, approved, name, user_id, starts_at } = this.state.repair;
-    const user_name = this.retrieve_user_name(user_id);
+    const user_name = this.retrieveUserName(user_id);
     const comment_vdom = comments.map((entity) =>
       <li key={entity.id}>{entity.comment}</li>
     );
@@ -315,7 +315,7 @@ class Repair extends React.Component{
   }
 }
 
-class AddNewRepair extends React.Component{
+class AddNewRepair extends React.Component {
   constructor(props) {
     super(props);
 
@@ -324,13 +324,13 @@ class AddNewRepair extends React.Component{
     this.switchBackToButton = this.switchBackToButton.bind(this);
   }
 
-  handleAddNew(event){
+  handleAddNew(event) {
     event.preventDefault();
 
     this.setState({showButton: false});
   }
 
-  switchBackToButton(data){
+  switchBackToButton(data) {
     if (data.id){
       this.props.onSuccess(data);
       this.setState({showButton: true, entity: {name:'', complete:false, approved: false, user_id: ''}});
@@ -339,11 +339,11 @@ class AddNewRepair extends React.Component{
     }
   }
 
-  renderShowButton(){
+  renderShowButton() {
     return <button onClick={this.handleAddNew}>Add New Repair</button>;
   }
 
-  renderForm(){
+  renderForm() {
     return (
       <table>
         <tbody>
@@ -354,7 +354,7 @@ class AddNewRepair extends React.Component{
   }
 
   render() {
-    if(this.state.showButton){
+    if(this.state.showButton) {
       return this.renderShowButton();
     }else{
       return this.renderForm();
@@ -362,7 +362,7 @@ class AddNewRepair extends React.Component{
   }
 }
 
-class Repairs extends React.Component{
+class Repairs extends React.Component {
   constructor(props) {
     super(props);
 
@@ -376,7 +376,7 @@ class Repairs extends React.Component{
     this.handleRepairChange = this.handleRepairChange.bind(this);
   }
 
-  handleRepairChange(newEntity){
+  handleRepairChange(newEntity) {
     var entities = this.state.repairs.slice(0);
     var new_entities = entities.map((entity) => {
       if(entity.id === newEntity.id){
@@ -389,38 +389,38 @@ class Repairs extends React.Component{
     this.setState({repairs: new_entities})
   }
 
-  handleFilterForStartDateTimeChange(event){
+  handleFilterForStartDateTimeChange(event) {
     event.preventDefault();
 
     this.setState({filter_for_start_date_time: event.target.value});
   }
 
-  handleFilterForUserChange(event){
+  handleFilterForUserChange(event) {
     event.preventDefault();
 
     this.setState({filter_for_user: event.target.value});
   }
 
-  handleFilterForCompletenessChange(event){
+  handleFilterForCompletenessChange(event) {
     event.preventDefault();
 
     this.setState({filter_for_completeness: event.target.value});
   }
 
-  handleSwitchToUserManagement(event){
+  handleSwitchToUserManagement(event) {
     event.preventDefault();
 
     this.props.onSwitchToUsers();
   }
 
-  handleAddNew(entity){
+  handleAddNew(entity) {
     var new_repairs = this.state.repairs.slice(0);
     new_repairs.push(entity);
 
     this.setState({repairs: new_repairs})
   }
 
-  handleDelete(removed_id){
+  handleDelete(removed_id) {
     var new_repairs = this.state.repairs.filter((repair) => { return repair.id != removed_id });
 
     this.setState({repairs: new_repairs})
@@ -440,56 +440,62 @@ class Repairs extends React.Component{
     })
   }
 
-  filter_by_completeness(source){
-    return source.filter((repair) =>{
-      if(this.state.filter_for_completeness === '0'){
-        return true;
+  filterByCompleteness(source) {
+    return source.filter((repair) => {
+      let returnValue;
+      if (this.state.filter_for_completeness === '0') {
+        returnValue = true;
       }
-      if(this.state.filter_for_completeness === '1'){
-        return repair.complete;
+      if (this.state.filter_for_completeness === '1') {
+        returnValue = repair.complete;
       }
-      if(this.state.filter_for_completeness === '2'){
-        return !repair.complete;
+      if (this.state.filter_for_completeness === '2') {
+        returnValue = !repair.complete;
       }
+      return returnValue;
     });
   }
 
-  filter_by_user(source){
-    return source.filter((repair) =>{
-      if(this.state.filter_for_user === '-1'){
-        return true;
-      }else{
-        return repair.user_id === parseInt(this.state.filter_for_user);
+  filterByUser(source) {
+    return source.filter((repair) => {
+      let returnValue;
+      if (this.state.filter_for_user === '-1'){
+        returnValue = true;
+      } else {
+        returnValue = (repair.user_id === parseInt(this.state.filter_for_user));
       }
+      return returnValue;
     });
   }
 
-  filter_by_start_date_time(source){
+  filterByStartDateTime(source) {
     const date_check = new RegExp(this.state.filter_for_start_date_time, 'g');
 
     return source.filter((repair) =>{
-      if(this.state.filter_for_start_date_time === ''){
-        return true;
-      }else{
-        return repair.starts_at && repair.starts_at.match(date_check);
+      let returnValue;
+      if(this.state.filter_for_start_date_time === '') {
+        returnValue = true;
+      } else {
+        returnValue = (repair.starts_at && repair.starts_at.match(date_check));
       }
+      return returnValue;
     });
   }
 
   render() {
-    if(!this.state.users){
+    if(!this.state.users) {
       return null;
     }
 
-    var filtered_by_completeness = this.filter_by_completeness(this.state.repairs);
-    var filtered_by_user = this.filter_by_user(filtered_by_completeness);
-    var filtered_by_date_time = this.filter_by_start_date_time(filtered_by_user);
+    let filteredByCompleteness = this.filterByCompleteness(this.state.repairs);
+    let filteredByUser = this.filterByUser(filteredByCompleteness);
+    let filteredByDateTime = this.filterByStartDateTime(filteredByUser);
 
-    var content = filtered_by_date_time.map((entity) =>
+    let content = filteredByDateTime.map((entity) =>
       <Repair key={entity.id} entity={entity} users={this.state.users} onDelete={this.handleDelete} onChange={this.handleRepairChange} />
     );
 
-    var filter_by_user_vdom = this.state.users.map((user) =>
+    let filterByUserVdom = this.state.users.map((user) =>
       <option key={user.id} value={user.id}>{user.name}</option>
     );
 
@@ -513,7 +519,7 @@ class Repairs extends React.Component{
                 User
                 <select onChange={this.handleFilterForUserChange}>
                   <option value='-1'>No filter</option>
-                  {filter_by_user_vdom}
+                  {filterByUserVdom}
                 </select>
               </th>
               <th>
@@ -534,7 +540,7 @@ class Repairs extends React.Component{
   } 
 }
 
-class UserForm extends React.Component{
+class UserForm extends React.Component {
   constructor(props) {
     super(props);
 
@@ -547,9 +553,8 @@ class UserForm extends React.Component{
     this.handleDelete = this.handleDelete.bind(this);
   }
 
-  handleDelete(){
+  handleDelete() {
     event.preventDefault();
-
 
     axios({
       method: 'DELETE',
@@ -562,14 +567,14 @@ class UserForm extends React.Component{
     });
   }
 
-  handleCancel(){
+  handleCancel() {
     event.preventDefault();
     const entity = (this.state.id) ? this.props.entity : this.state;
 
     this.props.switchToViewMode(entity);
   }
 
-  handleSubmit(event){
+  handleSubmit(event) {
     event.preventDefault();
 
     const url = (this.state.id) ? Routes.user_path(this.state.id,'json') : Routes.users_path('json');
@@ -587,17 +592,17 @@ class UserForm extends React.Component{
     });
   }
 
-  handleNameChange(event){
+  handleNameChange(event) {
     this.setState({name: event.target.value});
   }
 
-  handleAdminChange(event){
+  handleAdminChange(event) {
     const target = event.target;
     const value = target.checked;
     this.setState({admin: value});
   }
 
-  render(){
+  render() {
     const { name, admin } = this.state;
 
     var delete_button = this.props.onDelete ? <input type="submit" value="Delete" onClick={this.handleDelete} /> : '';
@@ -620,7 +625,7 @@ class UserForm extends React.Component{
   }
 }
 
-class AddNewUser extends React.Component{
+class AddNewUser extends React.Component {
   constructor(props) {
     super(props);
 
@@ -629,24 +634,24 @@ class AddNewUser extends React.Component{
     this.switchBackToButton = this.switchBackToButton.bind(this);
   }
 
-  handleAddNew(event){
+  handleAddNew(event) {
     event.preventDefault();
 
     this.setState({showButton: false});
   }
 
-  switchBackToButton(data){
-    if (data.id){
+  switchBackToButton(data) {
+    if (data.id) {
       this.props.onSuccess(data);
     }
     this.setState({showButton: true, entity: data});
   }
 
-  renderShowButton(){
+  renderShowButton() {
     return <button onClick={this.handleAddNew}>Add New User</button>;
   }
 
-  renderForm(){
+  renderForm() {
     return (
       <table>
         <tbody>
@@ -665,7 +670,7 @@ class AddNewUser extends React.Component{
   }
 }
 
-class User extends React.Component{
+class User extends React.Component {
   constructor(props) {
     super(props);
 
@@ -676,7 +681,7 @@ class User extends React.Component{
     this.handleDelete = this.handleDelete.bind(this);
   }
 
-  handleDelete(){
+  handleDelete() {
     this.props.onDelete(this.state.entity.id);
   }
 
@@ -714,7 +719,7 @@ class User extends React.Component{
   }
 }
 
-class Users extends React.Component{
+class Users extends React.Component {
   constructor(props) {
     super(props);
 
@@ -724,20 +729,20 @@ class Users extends React.Component{
     this.handleSwitchToRepairManagement = this.handleSwitchToRepairManagement.bind(this);
   }
 
-  handleSwitchToRepairManagement(event){
+  handleSwitchToRepairManagement(event) {
     event.preventDefault();
 
     this.props.onSwitchToRepairs();
   }
 
-  handleAddNew(entity){
+  handleAddNew(entity) {
     var entities = this.state.entities.slice(0);
     entities.push(entity);
 
     this.setState({entities: entities})
   }
 
-  handleDelete(removed_id){
+  handleDelete(removed_id) {
     var new_entities = this.state.entities.filter((entity) => { return entity.id != removed_id });
 
     this.setState({entities: new_entities})
