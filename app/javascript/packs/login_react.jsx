@@ -54,7 +54,7 @@ export default class Login extends React.Component {
     return (
       <div>
         <p>
-          Please provide your authentication info for login
+          Please provide your authentication info for login!
         </p>
         <form onSubmit={this.handleSubmit}>
           <label>

@@ -8,6 +8,11 @@
     "react": "^15.6.1",
     "react-dom": "^15.6.1"
   },
+  "scripts": {
+    "start": "webpack-dev-server --hot --inline"
+  },
+  "author": "Botond Orban",
+  "description": "A project for learning react.",
   "devDependencies": {
     "webpack-dev-server": "^2.8.2"
   }
