@@ -2,6 +2,7 @@ import Login from './login_react'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
+import axios from 'axios';
 
 export default class UserView extends React.Component {
   constructor(props) {
@@ -35,20 +36,22 @@ export default class UserView extends React.Component {
   }
 
   componentWillMount() {
-    $.ajax({ url: Routes.repairs_path('json', {user_id: this.props.user.id})}).done((msg)=>{
-        this.setState({repairs: msg})
-      });
+    axios.get( Routes.repairs_path('json', {user_id: this.props.user.id}) )
+    .then((response) => {
+      var data = response.data;
+      this.setState({repairs: data})
+    })
   }
 
   filter_by_completeness(source){
     return source.filter((repair) =>{
-      if(this.state.filter_complete === '0'){
+      if(this.state.filter_for_complete === '0'){
         return true;
       }
-      if(this.state.filter_complete === '1'){
+      if(this.state.filter_for_complete === '1'){
         return repair.complete;
       }
-      if(this.state.filter_complete === '2'){
+      if(this.state.filter_for_complete === '2'){
         return !repair.complete;
       }
     });
@@ -68,8 +71,9 @@ export default class UserView extends React.Component {
 
   render() {
     var filtered_by_completeness = this.filter_by_completeness(this.state.repairs);
+    var filtered_by_start_date_time = this.filter_by_start_date_time(filtered_by_completeness);
 
-    var content = filtered_by_completeness.map((entity) =>
+    var content = filtered_by_start_date_time.map((entity) =>
       <Repair key={entity.id} entity={entity} />
     );
 
@@ -135,14 +139,15 @@ class AddNewComment extends React.Component{
   }
 
   handleSubmit(){
-    $.ajax({
+    axios({
       method: 'POST',
       url: Routes.comments_path('json'),
       data: {comment: { comment: this.state.comment, repair_id: this.props.entity.id }}
-    }).done(( msg ) => {
-      this.switchToViewMode(msg);
-      this.props.onSuccess(msg);
-    }).fail(function(msd){
+    }).then((response) => {
+      var data = response.data;
+      this.switchToViewMode(data);
+      this.props.onSuccess(data);
+    }).catch(function(msg){
       alert( "Sorry, unauthorized!" );
     });
   }
@@ -189,27 +194,28 @@ class Repair extends React.Component {
 
   handleStart(event){
     event.preventDefault();
-
-    $.ajax({
+    axios({
       method: 'PUT',
       url: Routes.start_repair_path(this.state.id,'json')
-    }).done(( msg ) => {
-      this.setState( msg);
-    }).fail(function(msd){
-      alert( "Sorry, we need to wait for another Repair to be finished!" );
+    }).then((response) => {
+      var data = response.data;
+      this.setState( data);
+    }).catch(function(msg){
+      alert( "Sorry, unauthorized!" );
     });
   }
 
   handleComplete(event){
     event.preventDefault();
 
-    $.ajax({
+    axios({
       method: 'PATCH',
       url: Routes.repair_path(this.state.id,'json'),
       data: {repair: { complete: true }}
-    }).done(( msg ) => {
-      this.setState( msg);
-    }).fail(function(msd){
+    }).then((response) => {
+      var data = response.data;
+      this.setState( data);
+    }).catch(function(msg){
       alert( "Sorry, unauthorized!" );
     });
   }

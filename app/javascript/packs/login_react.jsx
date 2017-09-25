@@ -3,6 +3,7 @@ import UserView from './user_react'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
+import axios from 'axios';
 
 export default class Login extends React.Component {
   constructor(props) {
@@ -36,18 +37,19 @@ export default class Login extends React.Component {
   handleSubmit(event) {
     event.preventDefault();
 
-    $.ajax({
-      url: Routes.login_users_path(),
-      data: { name: this.state.name, password: this.state.pwd }
-    }).done(( msg ) => {
-      if(msg.admin){
-        this.switchToAdminView(msg);
-      }else{
-        this.switchToUserView(msg);
-      }
-    }).fail(function(msd){
-      alert( "Sorry, unauthorized!" );
-    });
+    axios.get( Routes.login_users_path('json',{ 
+        name: this.state.name, 
+        password: this.state.pwd 
+      })).then((response) => {
+        var data = response.data;
+        if(data.admin){
+          this.switchToAdminView(data);
+        }else{
+          this.switchToUserView(data);
+        }
+      }).catch(error => {
+        alert( "Sorry, unauthorized!" );
+      });
   }
 
   render() {
@@ -119,14 +121,15 @@ class Register extends React.Component {
   handleSubmit(event) {
     event.preventDefault();
 
-    $.ajax({
+    axios({
       method: 'POST',
       url: Routes.register_users_path('json'),
       data: { name: this.state.name, password: this.state.pwd }
-    }).done(( msg ) => {
-      this.switchToUserView(msg);
-    }).fail(function(msd){
-      alert( "Sorry, the user with the same name already exists. Pick another username!" );
+    }).then((response) => {
+      var data = response.data;
+      this.switchToUserView(data);
+    }).catch(function(msg){
+      alert( "Sorry, the user is already taken! Please pick another username" );
     });
   }
 

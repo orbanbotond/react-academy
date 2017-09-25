@@ -1,6 +1,7 @@
 import Login from './login_react'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import axios from 'axios';
 
 export default class AdminView extends React.Component {
   constructor(props) {
@@ -65,13 +66,12 @@ class RepairForm extends React.Component{
   handleDelete(){
     event.preventDefault();
 
-    $.ajax({
-      method: 'DELETE',
-      url: Routes.repair_path(this.state.id,'json')
-    }).done(( msg ) => {
-      this.props.onDelete(this.state.id);
-    }).fail(function(msd){
-      alert( "Sorry, unauthorized!" );
+    axios.delete( Routes.repair_path(this.state.id,'json')
+      ).then((response) => {
+        var data = response.data;
+        this.props.onDelete(this.state.id);
+      }).catch(error => {
+        alert( "Sorry, unauthorized!" );
     });
   }
 
@@ -88,13 +88,14 @@ class RepairForm extends React.Component{
     const url = (this.state.id) ? Routes.repair_path(this.state.id,'json') : Routes.repairs_path('json');
     const method = (this.state.id) ? 'PATCH' : 'POST';
 
-    $.ajax({
+    axios({
       method: method,
       url: url,
       data: {repair: { name: this.state.name, complete: this.state.complete, approved: this.state.approved, user_id: this.state.user_id }}
-    }).done(( msg ) => {
-      this.props.switchToViewMode(msg);
-    }).fail(function(msd){
+    }).then((response) => {
+      var data = response.data;
+      this.props.switchToViewMode(data);
+    }).catch(function(msg){
       alert( "Sorry, unauthorized!" );
     });
   }
@@ -191,14 +192,15 @@ class AddNewComment extends React.Component{
   }
 
   handleSubmit(){
-    $.ajax({
+    axios({
       method: 'POST',
       url: Routes.comments_path('json'),
       data: {comment: { comment: this.state.comment, repair_id: this.props.entity.id }}
-    }).done(( msg ) => {
-      this.switchToViewMode(msg);
-      this.props.onSuccess(msg);
-    }).fail(function(msd){
+    }).then((response) => {
+      var data = response.data;
+      this.switchToViewMode(data);
+      this.props.onSuccess(data);
+    }).catch(function(msg){
       alert( "Sorry, unauthorized!" );
     });
   }
@@ -425,13 +427,17 @@ class Repairs extends React.Component{
   }
 
   componentWillMount() {
-    $.ajax({ url: Routes.repairs_path('json')}).done((msg)=>{
-        this.setState({repairs: msg})
-      });
+    axios.get( Routes.repairs_path('json') )
+    .then((response) => {
+      var data = response.data;
+      this.setState({repairs: data});
+    })
 
-    $.ajax({ url: Routes.users_path('json')}).done((msg)=>{
-        this.setState({users: msg})
-      });
+    axios.get( Routes.users_path('json') )
+    .then((response) => {
+      var data = response.data;
+      this.setState({users: data})
+    })
   }
 
   filter_by_completeness(source){
@@ -544,12 +550,14 @@ class UserForm extends React.Component{
   handleDelete(){
     event.preventDefault();
 
-    $.ajax({
+
+    axios({
       method: 'DELETE',
       url: Routes.user_path(this.state.id,'json')
-    }).done(( msg ) => {
+    }).then((response) => {
+      var data = response.data;
       this.props.onDelete(this.state.id);
-    }).fail(function(msd){
+    }).catch(function(msg){
       alert( "Sorry, unauthorized!" );
     });
   }
@@ -567,13 +575,14 @@ class UserForm extends React.Component{
     const url = (this.state.id) ? Routes.user_path(this.state.id,'json') : Routes.users_path('json');
     const method = (this.state.id) ? 'PATCH' : 'POST';
 
-    $.ajax({
+    axios({
       method: method,
       url: url,
       data: {user: { name: this.state.name, admin: this.state.admin }}
-    }).done(( msg ) => {
-      this.props.switchToViewMode(msg);
-    }).fail(function(msd){
+    }).then((response) => {
+      var data = response.data;
+      this.props.switchToViewMode(data);
+    }).catch(function(msg){
       alert( "Sorry, unauthorized!" );
     });
   }
@@ -735,9 +744,11 @@ class Users extends React.Component{
   }
 
   componentWillMount() {
-    $.ajax({ url: Routes.users_path('json')}).done((msg)=>{
-        this.setState({entities: msg})
-      });
+    axios.get( Routes.users_path('json') )
+    .then((response) => {
+      var data = response.data;
+      this.setState({entities: msg})
+    })
   }
 
   render() {

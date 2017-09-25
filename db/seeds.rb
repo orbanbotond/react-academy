@@ -11,5 +11,5 @@ gyongyi = User.create name: 'Gyongyi', admin: false, password: 'sex'
 
 cadillac = Repair.create name: 'Cadilac'
 teslaX = Repair.create name: 'teslaX'
-teslaS = Repair.create name: 'teslaS'
+teslaS = Repair.create name: 'teslaS', user: gyongyi
 teslaX.comments.create comment: 'The best car ever'
