@@ -747,7 +747,7 @@ class Users extends React.Component{
     axios.get( Routes.users_path('json') )
     .then((response) => {
       var data = response.data;
-      this.setState({entities: msg})
+      this.setState({entities: data})
     })
   }
 
